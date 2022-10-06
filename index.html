@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="ua">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Інтерактивна мапа бойових дій в Україні</title>
+    <link rel="stylesheet" href="/css/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <link rel="stylesheet" href="dist/L.Control.MapCenterCoord.min.css" />
+    <link rel="stylesheet" href="dist/Control.MiniMap.min.css" />
+    <link href="https://use.fontawesome.com/releases/v5.0.8/css/all.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;600&display=swap" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.pm@latest/dist/leaflet.pm.css" />
+    <link rel="stylesheet" href= "/css/leaflet-ruler.css" />
+
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+
+    <style>
+        .fa-b:before {
+        font-family: Courier;
+        font-weight: bold;
+        content: 'B';
+        }
+    </style>
+</head>
+
+
+<body>
+    <div id="map"></div>
+</body>
+
+
+
+</html>
+
+
+
+
+<script src="/js/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<script src="dist/L.Control.MapCenterCoord.min.js"></script>
+<script src="js/Leaflet.Control.Custom.js"></script>
+<script src="https://unpkg.com/leaflet.pm@latest/dist/leaflet.pm.min.js"></script>
+<script src="js/leaflet-ruler.js"></script>
+
+<script src="./data-ua/north.js"></script>
+<script src="./data-ua/northa.js"></script>
+<script src="./data-ua/northb.js"></script>
+<script src="./data-ua/northc.js"></script>
+<script src="./data-ua/northd.js"></script>
+
+
+<script src="./data-ua/northkharkov.js"></script>
+<script src="./data-ua/northkharkov2.js"></script>
+<script src="./data-ua/northeastdnbs.js"></script>
+<script src="./data-ua/southcua.js"></script>
+<script src="./data-ua/southua.js"></script>
+<script src="./data-ua/southaua.js"></script>
+<script src="./data-ua/southbua.js"></script>
+<script src="./data-ua/zmiy.js"></script>
+
+
+<script src="./data-ru/dniester.js"></script>
+<script src="./data-ru/crimea.js"></script>
+<script src="./data-ru/south.js"></script>
+<script src="./data-ru/ordlo.js"></script>
+<script src="./data-ru/northeast.js"></script>
+<script src="./data-ru/east.js"></script>
+<script src="./data-ru/georgia.js"></script>
+<script src="./data-ru/chechen.js"></script>
+
+
+
+<a href="https://www.maptiler.com" style="position:absolute;left:20px;bottom:40px;width:40px;height:20px;z-index:999;"><img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo"></a>
+
+
+
+
+
+<script>
+
+var map = L.map('map', {measureControl:true}).setView([49.0139, 31.2858], 7)
+
+
+// GeoCoder
+var geocoder = L.Control.geocoder({
+  defaultMarkGeocode: false,
+  position: 'topleft',
+  placeholder: "Здійснити пошук...",
+  errorMessage: "Не знайдено.",
+  showResultIcons: true,
+  expand: "Клік",
+  collapsed: false,
+})
+  .on('markgeocode', function(e) {
+    var bbox = e.geocode.bbox;
+    var poly = L.polygon([
+      bbox.getSouthEast(),
+      bbox.getNorthEast(),
+      bbox.getNorthWest(),
+      bbox.getSouthWest()
+    ]).addTo(map);
+    map.fitBounds(poly.getBounds());
+  })
+  .addTo(map);
+
+// Zoom Control
+map.zoomControl.setPosition('topleft');
+
+
+// Control CenterCoord
+L.control.mapCenterCoord({
+    position: 'bottomleft'
+}).addTo(map);
+
+
+// Control Scale
+L.control.scale({
+    maxWidth: 75,
+    metric: true,
+    imperial: false,
+    position: 'bottomleft'
+}).addTo(map);
+
+
+
+standart = L.tileLayer('https://api.maptiler.com/maps/openstreetmap/{z}/{x}/{y}.jpg?key=kKhYNaLtgJhUBX5XNL9q',{
+        tileSize: 512,
+        zoomOffset: -1,
+        minZoom: 7,
+        maxZoom: 15,
+        attribution: "\u003ca href=\"https://www.maptiler.com/copyright/\" target=\"_blank\"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
+        crossOrigin: true
+      }).addTo(map);
+
+satellite = L.tileLayer('https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=kKhYNaLtgJhUBX5XNL9q',{
+        tileSize: 512,
+        zoomOffset: -1,
+        minZoom: 7,
+        maxZoom: 15,
+        attribution: "\u003ca href=\"https://www.maptiler.com/copyright/\" target=\"_blank\"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
+        crossOrigin: true
+      }).addTo(map);
+
+
+// Control Layers
+var Maps = {
+    "Супутниковий MapTiler": satellite,
+    "Стандартний MapTiler": standart,
+};
+var layerControl = L.control.layers(Maps)
+layerControl.setPosition('topleft')
+layerControl.addTo(map);
+
+// Lineika
+var options = {
+          position: 'topleft',
+          lengthUnit: {
+            factor: 0.539956803,    //  from km to nm
+            display: 'Nautical Miles',
+            decimal: 2
+          },
+          lengthUnit: {                 // You can use custom length units. Default unit is kilometers.
+          display: 'km',              // This is the display value will be shown on the screen. Example: 'meters'
+          decimal: 2,                 // Distance result will be fixed to this value. 
+          factor: null,               // This value will be used to convert from kilometers. Example: 1000 (from kilometers to meters)  
+          label: '<b>Дистанція:</b>'           
+      },
+      angleUnit: {
+        display: '&deg;',           // This is the display value will be shown on the screen. Example: 'Gradian'
+        decimal: 2,                 // Bearing result will be fixed to this value.
+        factor: null,                // This option is required to customize angle unit. Specify solid angle value for angle unit. Example: 400 (for gradian).
+        label: ''
+      }
+        };
+L.control.ruler(options).addTo(map);
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Captured territories
+L.geoJSON(dniesterJson, {
+    onEachFeatures: function(feature, layer) {
+        layer.bindPopup('<b>Придністров`я</b>')
+    },
+    style: {
+        fillColor: '#ff8a8a',
+        fillOpacity: 0.2,
+        color: '#b32c2c',
+        weight: 1,
+    }
+}).addTo(map);
+
+
+L.geoJSON(crimeaJson, {
+    onEachFeatures: function(feature, layer) {
+    },
+    style: {
+        fillColor: '#fe6c6c',
+        fillOpacity: 0.2,
+        color: '#8c0000',
+        weight: 1,
+    }
+}).addTo(map);
+
+
+L.geoJSON(ordloJson, {
+    onEachFeatures: function(feature, layer) {
+    },
+    style: {
+        fillColor: '#fe6c6c',
+        fillOpacity: 0.2,
+        color: '#8c0000',
+        weight: 1,
+    }
+}).addTo(map);
+
+
+L.geoJSON(southJson, {
+    onEachFeatures: function(feature, layer) {
+    },
+    style: {
+        fillColor: '#ad0000',
+        fillOpacity: 0.2,
+        color: '#bd0000',
+        weight: 1,
+    }
+}).addTo(map);
+
+
+L.geoJSON(northeastJson, {
+    onEachFeatures: function(feature, layer) {
+    },
+    style: {
+        fillColor: '#ad0000',
+        fillOpacity: 0.2,
+        color: '#bd0000',
+        weight: 1,
+    }
+}).addTo(map);
+
+
+L.geoJSON(eastJson, {
+    onEachFeatures: function(feature, layer) {
+    },
+    style: {
+        fillColor: '#ad0000',
+        fillOpacity: 0.2,
+        color: '#bd0000',
+        weight: 1,
+    }
+}).addTo(map);
+
+
+L.geoJSON(georgiaJson, {
+    onEachFeatures: function(feature, layer) {
+        layer.bindPopup('<b></b>')
+    },
+    style: {
+        fillColor: '#ff3030',
+        fillOpacity: 0.3,
+        color: '#7d1616',
+        weight: 1,
+    }
+}).addTo(map);
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Liberated territory
+L.geoJSON(northJson, {
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup('<b><font face="Robotolight">Звільнена територія ⚡</b> <br</br> <font face="sans-serif"><br><b>02.04</b> Оперативне командування «Північ» повідомило, що Чернігівська область була звільнена від російських загарбників. </br>')
+        },
+        style: {
+            fillColor: '#00abf5',
+            fillOpacity: 0.2,
+            color: '#0093f5',
+            weight: 1,
+        }
+    }).addTo(map)
+
+
+    L.geoJSON(northaJson, {
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup('<b><font face="Robotolight">Звільнена територія ⚡</b> <br</br> <font face="sans-serif"><br><b>02.04</b> Оперативне командування «Північ» повідомило, що Чернігівська область була звільнена від російських загарбників. </br>')
+        },
+        style: {
+            fillColor: '#00abf5',
+            fillOpacity: 0.2,
+            color: '#0093f5',
+            weight: 1,
+        }
+    }).addTo(map)
+
+
+    L.geoJSON(northbJson, {
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup('<b><font face="Robotolight">Звільнена територія ⚡</b> <br</br> <font face="sans-serif"><br><b>02.04</b> Оперативне командування «Північ» повідомило, що Чернігівська область була звільнена від російських загарбників. </br>')
+        },
+        style: {
+            fillColor: '#00abf5',
+            fillOpacity: 0.2,
+            color: '#0093f5',
+            weight: 1,
+        }
+    }).addTo(map)
+
+
+    L.geoJSON(northcJson, {
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup('<b><font face="Robotolight">Звільнена територія ⚡ </b><br> </br><font face="sans-serif"><br><b>28.03</b> Ірпень був звільнен від російських загарбників. </br> <br><b>01.04 - 02.04</b> Буча, Гостомель, Київська область звільнені.')
+        },
+        style: {
+            fillColor: '#00abf5',
+            fillOpacity: 0.2,
+            color: '#0093f5',
+            weight: 1,
+        }
+    }).addTo(map)
+
+
+    L.geoJSON(northdJson, {
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup('<b><font face="Robotolight">Звільнена територія ⚡</b> <br></br><font face="sans-serif"> <br><b>08.04</b> Голова Сумської ОВА повідомив про звільнення області від російських загарбників. </br> <br><b>01.04</b> Голова Сумської ОДА повідомив, що Тростянець та інші населені пункти звільнені. ')
+        },
+        style: {
+            fillColor: '#00abf5',
+            fillOpacity: 0.2,
+            color: '#0093f5',
+            weight: 1,
+        }
+    }).addTo(map)
+
+
+    L.geoJSON(northeastdnbsJson, {
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup('<b><font face="Robotolight">Звільнена територія ⚡</b> <br></br><font face="sans-serif"> <br><b>04.09</b> Верхвоний Головнокомандувач повідомив про звільнення населеного пункту на Донеччині бійцями 63-м батальйоном 103-ї бригади тероборони.<br> <br><b>07.09</b> Вночі було знято відео де Українські бійці зайшли до Старого Коровану.</br> <br><b>09.09 - 10.09</b> Один із російських військових телеграм-каналів повідомив: "Началась оборона Лимана. С нами бог.". Інформація підтверджена, жива сила та техніка ворога покинула Лиман до прибуття українських військових, також підтвердженно звільнення Ямпіля.</br> <br>В зонах де пусто, поки нема достовірної інформації про звільнення населених пунктів.</br>')
+        },
+        style: {
+            fillColor: '#00abf5',
+            fillOpacity: 0.2,
+            color: '#0093f5',
+            weight: 1,
+        }
+    }).addTo(map)
+
+
+    L.geoJSON(northkharkovJson, {
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup('<b><font face="Robotolight">Звільнена територія ⚡</b> <br></br><font face="sans-serif"> <br><b>16.04</b> Зі зведень Генштабу ЗСУ, ворог втратив свої позиції на схід від Харкова.</br> <br><b>10.05</b> Зі зведень Генштабу ЗСУ, на північ від Харкова у результаті контрнаступу, ворога було відкинуто до Рубіжного та Тернової. </br> <br><b>11.09</b> 9 та 10 вересня російські загарбники повідомили про те що тікають з населених пунктів, сьогодні це підтверджено, у мережі також з`явились відео де українські військові знаходяться на державних кордонах України та Росії. Підтверджено звільнення деяких населених пунктів і Козачої Лопані.</br> ')
+        },
+        style: {
+            fillColor: '#00abf5',
+            fillOpacity: 0.2,
+            color: '#0093f5',
+            weight: 1,
+        }
+    }).addTo(map)
+
+
+    L.geoJSON(northkharkov2Json, {
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup('<b><font face="Robotolight">Звільнена територія ⚡</b> <font face="sans-serif"> <br><b>07.09</b> Підтверджено звільнення Байрака, Гусарівки та Щурівки. </br> <br><b>08.09 - 10.09</b> <br>Скоротив інформація, так як її було дуже багато, за ці дати підтверджено звільнення більше 30 населених пунктів та штурмів Балаклії, Куп`янська та інших. ЗСУ перейшли до глобального контрнаступу у Харьківській та Донецькій областях, з`явилася інформація про успіхи ЗСУ у Ізюму, і також в сторону державних кордонів до Вовчанська. </br> <br><b>11.09</b> Підтвердження звільнення Великого Бурлуку, Дворічної та інших населених пунктів, зачистка Ізюму триває. </br> <br>В зонах де пусто, поки нема достовірної інформації про звільнення населених пунктів.')
+        },
+        style: {
+            fillColor: '#00abf5',
+            fillOpacity: 0.2,
+            color: '#0093f5',
+            weight: 1,
+        }
+    }).addTo(map)
+
+
+    L.geoJSON(southcuaJson, {
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup('<b><font face="Robotolight">Звільнена територія ⚡ 16.03 - ?.04 </b>')
+        },
+        style: {
+            fillColor: '#00abf5',
+            fillOpacity: 0.2,
+            color: '#0093f5',
+            weight: 1,
+        }
+    }).addTo(map)
+
+
+    L.geoJSON(southuaJson, {
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup('<b><font face="Robotolight">Звільнена територія ⚡</b> </br><br> <br><b>25.03</b> Зі зведень Генштабу ЗСУ, Новоронцово звільнено.</br> <br><b>06.04 - 07.04</b> Зі зведень Генштабу ЗСУ, Оскорівка, Добрянка і інші населені пункти звільнені.</br>')
+        },
+        style: {
+            fillColor: '#00abf5',
+            fillOpacity: 0.2,
+            color: '#0093f5',
+            weight: 1,
+        }
+    }).addTo(map)
+
+
+    L.geoJSON(southauaJson, {
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup('<b><font face="Robotolight">Звільнена територія ⚡</b> <br></br> <br><b>04.09</b> Верховний Головнокомандувач підтвердив звільнення Високопілля та Ольгіного 42-им окремим мотопіхотним батальйоном. </br> <br> <b>06.09</b> Був піднятий український прапор над Нововознесенському. </br> <br>Уточнення біля Архангельського</br>')
+        },
+        style: {
+            fillColor: '#00abf5',
+            fillOpacity: 0.2,
+            color: '#0093f5',
+            weight: 1,
+        }
+    }).addTo(map)
+
+
+    L.geoJSON(southbuaJson, {
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup('<b><font face="Robotolight">Звільнена територія ⚡</b><br><b>02.07</b> Зі зведень Генштабу ЗСУ, ворог втратив контроль над Іванівкой. </br> <br><b>30.03</b> Зі зведень Генштабу ЗСУ, ворог втратив контроль над Мар`їним, Наталиним та іншими. </br>  <br><b>14.06</b> Зі зведень Генштабу ЗСУ, ворог замінував узбережжя річки Інгулець.</br> <br><b>29.08</b> Не перевірена інформація, у результаті початку контрнаступу ЗСУ, так звані війська 109-го полку ДНР підтвердили, те що українські військові прорвали рубежі оборони.')
+        },
+        style: {
+            fillColor: '#00abf5',
+            fillOpacity: 0.2,
+            color: '#0093f5',
+            weight: 1,
+        },  
+    }).addTo(map)
+
+
+    L.geoJSON(zmiyJson, {
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup('<b><font face="Robotolight">Звільнена територія ⚡</b>')
+        },
+        style: {
+            fillColor: '#00abf5',
+            fillOpacity: 0.2,
+            color: '#0093f5',
+            weight: 1,
+        },  
+    }).addTo(map)
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+//Ru markers
+var enemy = L.icon({
+    iconUrl: './images/RU/enemy.png',
+    iconSize: [28, 28],
+});
+var enemy = L.marker([48.01553, 37.80343], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Донецька окупаційна адміністрація 💩').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemy.png',
+    iconSize: [28, 28],
+});
+var enemy = L.marker([47.09102, 37.55372], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Маріупольська окупаційна адміністрація 💩').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemy.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([46.83706, 35.35606], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Мелітопольска окупаційна адміністрація 💩').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemy.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([46.75204, 36.79708], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Бердянська окупаційна адміністрація 💩').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemy.png',
+    iconSize: [18, 18],
+});
+var enemy = L.marker([47.49691, 34.63122], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Еноргадарська окупаційна адміністрація 💩').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemy.png',
+    iconSize: [28, 28],
+});
+var enemy = L.marker([44.59603, 33.50710], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Севастопольська окупаційна адміністрація 💩').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemy.png',
+    iconSize: [28, 28],
+});
+var enemy = L.marker([44.95104, 34.09470], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Будівля Верховної Ради АРК 💩').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemy.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([46.75736, 33.36170], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Ново Каховська окупаційна адміністрація 💩').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemy.png',
+    iconSize: [28, 28],
+});
+var enemy = L.marker([46.64157, 32.61588], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Херсонська окупаційна адміністрація 💩').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemy.png',
+    iconSize: [28, 28],
+});
+var enemy = L.marker([48.56002, 39.27938], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Луганська окупаційна адміністрація 💩').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemy.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([48.91928, 38.42597], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Лисичанська окупаційна адміністрація 💩').openPopup()
+popup.addTo(map);
+
+
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemybase.png',
+    iconSize: [28, 28],
+});
+var enemy = L.marker([48.00405, 37.86601], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Донецький 1-й армійський корпус').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemybase.png',
+    iconSize: [28, 28],
+});
+var enemy = L.marker([46.72118, 32.65517], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Херсонська армійська дислокація').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemybase.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([48.94787, 38.48876], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Військова база підрозділів ЛНР').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemybase.png',
+    iconSize: [28, 28],
+});
+var enemy = L.marker([48.57524, 39.32178], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Луганський 2-й армійський корпус').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemybase.png',
+    iconSize: [28, 28],
+});
+var enemy = L.marker([50.59245, 36.59263], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Бєлгородська військова база').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemybase.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([48.90671, 38.42297], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Лисичанська Військова дислокація').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemybase.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([46.86764, 35.40155], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Мелітопольська військова дислокація').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemybase.png',
+    iconSize: [18, 18],
+});
+var enemy = L.marker([46.74527, 33.35827], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Ново-Каховська військова дислокація').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemybase.png',
+    iconSize: [28, 28],
+});
+var enemy = L.marker([51.93933, 39.17038], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Воронежська військова дислокація').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemybase.png',
+    iconSize: [18, 18],
+});
+var enemy = L.marker([47.44063, 39.25432], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Кузьминська військова дислокація').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemybase.png',
+    iconSize: [18, 18],
+});
+var enemy = L.marker([48.32108, 40.26099], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Каменська-Шахтинська військова дислокація').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemybase.png',
+    iconSize: [18, 18],
+});
+var enemy = L.marker([50.19459, 38.11071], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Валуйська військова дислокація').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemybase.png',
+    iconSize: [18, 18],
+});
+var enemy = L.marker([52.37464, 32.20371], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Климовська військова база').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/enemybase.png',
+    iconSize: [18, 18],
+});
+var enemy = L.marker([52.75500, 32.25809], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Клинцькова військова дислокація').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/power-plant.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([47.50688, 34.58582], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Запорізька АЕС ☢').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([45.09316, 33.60254], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеродром Саки').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([45.11484, 33.98518], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеродром Гвардійське').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([44.68888, 33.57332], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеродром Бельбек').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([45.69881, 34.41991], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеродром Джанкой').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([46.68007, 32.50640], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеродром Чорнобаївка').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([46.88132, 35.29650], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеродром Мелітополь').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([47.07737, 37.44810], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеропорт Маріуполь').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([46.81475, 36.73382], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеропорт Бердянськ').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([48.07039, 37.73443], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеропорт Донецьк').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([48.90005, 38.55326], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеропорт Севэродонецьк').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([47.49656, 39.91934], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеропорт Платов').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([47.27303, 39.63794], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеродром Ростов-Центр').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([47.19744, 38.85130], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеропорт Таганрог').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([48.95227, 40.29519], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеродром Міллєрово').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([48.31316, 41.79122], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеродром Морозовськ').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([50.79380, 40.60804], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеродром Бутурлинівка').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([51.81078, 39.22390], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеропорт Вороніж').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/airport.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([51.32877, 37.76889], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Аеродром Старий-Оскіл').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([47.11296, 33.35775], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських військових бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([46.76650, 33.26025], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських військових бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([46.68860, 32.55644], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських військових бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([46.68037, 32.73685], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських військових бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([46.65929, 32.64926], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських спец-розділів').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([46.81445, 33.57422], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських військових бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([46.74486, 32.72364], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських військових бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([47.26112, 33.86810], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських військових бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([47.21858, 33.87754], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських військових бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([47.51136, 34.59286], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських військових бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([47.49414, 34.65727], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських військових бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([47.43140, 35.27195], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських спец-розділів').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([47.38260, 34.99695], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([46.87744, 35.34988], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських спец-розділів').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([46.82508, 35.44121], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([47.01742, 34.92074], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([46.78319, 36.75030], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([46.74321, 36.34706], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([47.17128, 36.23497], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([47.12709, 37.56191], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([47.07043, 37.47917], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([47.22586, 37.30339], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([47.36505, 36.64627], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських спец-розділів').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([47.33050, 36.69468], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([47.70347, 37.22752], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([47.74914, 37.68843], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([48.00750, 37.83297], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([47.92393, 37.59127], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([48.04963, 37.97115], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських спец-розділів').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([48.56389, 39.30016], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських спец-розділів').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([48.45926, 38.78654], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських спец-розділів').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([48.30695, 37.99828], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських спец-розділів').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([48.11110, 39.33311], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських спец-розділів').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([48.93693, 38.49884], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських спец-розділів').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [30, 30],
+});
+var enemy = L.marker([50.59915, 36.59683], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських спец-розділів').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([48.08255, 37.76876], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([48.62996, 38.54656], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([49.00162, 38.11518], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([48.84800, 38.36065], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([48.81387, 38.49060], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([48.73797, 38.31139], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([48.72245, 38.25903], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([49.00162, 38.11518], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([48.67373, 38.15294], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([48.52854, 38.22710], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([48.43672, 38.23105], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([49.07454, 38.28701], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/RU/ru-special-section.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([49.04046, 37.56775], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Дислокація російських бригад').openPopup()
+popup.addTo(map);
+
+
+
+
+</script>
+
+
+
+
+
+<script>
+//BE Markers
+var enemy = L.icon({
+    iconUrl: './images/BE/belarusarmy.png',
+    iconSize: [18, 18],
+});
+var enemy = L.marker([52.31436, 31.17971], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Зябровська військова дислокація').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/BE/belarusarmy.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([52.42493, 31.01595], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Гомельська військова база').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/BE/belarusarmy.png',
+    iconSize: [18, 18],
+});
+var enemy = L.marker([51.81413, 29.17694], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Єльська військова дислокація').openPopup()
+popup.addTo(map);
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+<script>
+    //Ua Markers
+var enemy = L.icon({
+    iconUrl: './images/UA/unbreakable-cities.png',
+    iconSize: [30, 30],
+});
+var enemy = L.marker([50.43269, 30.51706], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Київ').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/UA/unbreakable-cities.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([49.98790, 36.22965], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Харків 💪').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/UA/unbreakable-cities.png',
+    iconSize: [25, 25],
+});
+var enemy = L.marker([46.96798, 31.99317], { icon:enemy });
+var popup = enemy.bindPopup('<font face="Robotolight">Миколаїв 💪').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/UA/unbreakable-cities.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([49.84125, 36.68678], { icon:enemy });
+var popup = enemy.bindPopup('<b><font face="Robotolight">Чугуїв 💪</b> <br>Контроль відновлено</br>').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/UA/unbreakable-cities.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([49.86719, 36.93483], { icon:enemy });
+var popup = enemy.bindPopup('<b><font face="Robotolight">Печеніги 💪</b> <br>Контроль відновлено</br>').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/UA/unbreakable-cities.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([49.46539, 36.86291], { icon:enemy });
+var popup = enemy.bindPopup('<b><font face="Robotolight">Балаклія 💪</b> <br>Контроль відновлено</br>').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/UA/unbreakable-cities.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([50.07229, 36.79682], { icon:enemy });
+var popup = enemy.bindPopup('<b><font face="Robotolight">Старий Салтів 💪</b> <br>Контроль відновлено</br>').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/UA/unbreakable-cities.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([49.70933, 37.61135], { icon:enemy });
+var popup = enemy.bindPopup('<b><font face="Robotolight">Велика частина Куп`янська 💪</b> <br>Контроль відновлено</br>').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/UA/unbreakable-cities.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([47.48571, 33.53680], { icon:enemy });
+var popup = enemy.bindPopup('<b><font face="Robotolight">Високопілля 💪</b> <br>Контроль відновлено</br>').openPopup()
+popup.addTo(map);
+
+
+var enemy = L.icon({
+    iconUrl: './images/UA/unbreakable-cities.png',
+    iconSize: [20, 20],
+});
+var enemy = L.marker([51.26729, 30.24467], { icon:enemy });
+var popup = enemy.bindPopup('<b><font face="Robotolight">Чорнобил 💪</b> <br>Контроль відновлено</br>').openPopup()
+popup.addTo(map);
+
+
+</script>
+
+
+
+<script>
+
+// WaterMark
+    L.Control.Watermark = L.Control.extend({
+    onAdd: function(map) {
+        var img = L.DomUtil.create('img');
+
+        img.src = './images/logo.png';
+        img.style.width = '150px';
+
+        return img;
+    },
+});
+    L.control.watermark = function(opts) {
+    return new L.Control.Watermark(opts);
+}
+
+L.control.watermark({ position: 'topright' }).addTo(map);
+
+
+
+L.Control.Watermark = L.Control.extend({
+    onAdd: function(map) {
+        var img = L.DomUtil.create('img');
+
+        img.src = './images/logo02.png';
+        img.style.width = '150px';
+
+        return img;
+    },
+});
+    L.control.watermark = function(opts) {
+    return new L.Control.Watermark(opts);
+}
+
+L.control.watermark({ position: 'topright' }).addTo(map);
+
+</script>
